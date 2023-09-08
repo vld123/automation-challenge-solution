@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  tester-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - tmpfs-report:/usr/share/serenity/report:rw
+    depends_on:
+      - reports-browser
+      - firefox
+      - world-app
+
+  world-app:
+    image: automation-challenge-automation-challenge:latest
+    ports:
+      - "8085:8080"
+
+  reports-browser:
+    image: nginx:latest
+    volumes:
+      - tmpfs-report:/usr/share/nginx/html:ro
+    ports:
+      - "8081:80"
+
+  firefox:
+    image: selenium/standalone-firefox:latest
+    ports:
+      - "4444:4444"
+
+volumes:
+  tmpfs-report:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=100m,mode=1777
